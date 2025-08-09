@@ -97,6 +97,10 @@ export type BarbaHookData = {
   next?: { container?: HTMLElement; namespace?: string };
 };
 
+/**
+ * @description
+ * The global module type, which is the same as the page module type but without the namespace property.
+ */
 export type GlobalModule = Omit<PageModule, 'namespace'>;
 
 /**
@@ -104,5 +108,8 @@ export type GlobalModule = Omit<PageModule, 'namespace'>;
  * The options for initializing a barba page.
  */
 export type InitOptions = {
-  pages: PageModule[];
+  /** Global modules executed via Barba global hooks on every page */
+  globals?: GlobalModule[];
+  /** Namespaced page modules executed via Views hooks */
+  pages?: PageModule[];
 };

@@ -2,8 +2,7 @@ import barba from '@barba/core';
 import prefetch from '@barba/prefetch';
 
 import { updateLenisScrollTrigger } from '$features/global/lenis/lenis';
-import type { BarbaHookData, Cleanup, InitOptions } from '$types/page';
-import { resetWebflow } from '$utils/destroyWebflow';
+import type { BarbaHookData, Cleanup, InitOptions, PageModule } from '$types/page';
 
 import { animationEnter, animationLeave } from './barbaTransitions';
 
@@ -28,14 +27,14 @@ async function handleCleanup(result: Cleanup) {
     cleanupStack.push((result as { destroy: () => void }).destroy);
 }
 
-export function initBarba({ pages }: InitOptions) {
+export function initBarba({ pages = [], globals = [] }: InitOptions) {
   let isFirstLoad = true;
 
   // Enable prefetch plugin
   barba.use(prefetch);
 
   const namespaced = pages.filter((m) => m.namespace !== undefined);
-  const globalMods = pages.filter((m) => m.namespace === undefined);
+  const globalMods = globals as PageModule[];
 
   // Map namespaced modules to Barba Views
   const views = namespaced
@@ -119,12 +118,12 @@ export function initBarba({ pages }: InitOptions) {
     });
   });
 
-  /**
-   * @description
-   * Reset Webflow on enter to ensure new page is loaded correctly
-   */
+  // Raw data on enter hook for global modules that need it (e.g., Webflow reset)
   barba.hooks.enter((data: BarbaHookData) => {
-    resetWebflow(data);
+    const modulesNeedingData: PageModule[] = globalMods.filter(
+      (m) => typeof m.onEnterData === 'function'
+    );
+    return Promise.all(modulesNeedingData.map((m) => m.onEnterData?.(data))).then(() => undefined);
   });
 
   barba.hooks.afterEnter((data: BarbaHookData) => {

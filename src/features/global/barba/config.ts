@@ -7,5 +7,6 @@ import { homepage } from '$pages/homepage';
  * Initialize page-specific modules & global core modules here
  */
 export const barbaConfig = {
-  pages: [webflowReset, homepage],
+  globals: [webflowReset],
+  pages: [homepage],
 };
