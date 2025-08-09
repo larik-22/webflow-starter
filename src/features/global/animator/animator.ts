@@ -1,17 +1,17 @@
 import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import type { GlobalModule } from '$types/page';
 
 import { animateFadeIn } from './animators/basic';
-import { animateTextWords } from './animators/text';
+import { animateTextLines, animateTextWords } from './animators/text';
 import type {
   AnimationKind,
   AnimationOptions,
   AnimatorCleanup,
   ElementAnimationConfig,
 } from './types';
-import { parseKinds, readBoolean, readNumber } from './utils';
+import { parseKinds, readBoolean, readNumber, restoreVisibility } from './utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,11 +43,12 @@ function buildConfig(element: HTMLElement): ElementAnimationConfig | null {
 function createScrollTrigger(element: HTMLElement, play: () => void, options: AnimationOptions) {
   const trigger = ScrollTrigger.create({
     trigger: element,
+    scroller: document.documentElement,
     start: options.start ?? 'top 85%',
     end: options.end ?? 'bottom top',
     once: options.once ?? true,
     markers: true,
-    toggleActions: 'play none none reset',
+    toggleActions: 'play none none nones',
     onEnter: play,
   });
   return trigger;
@@ -63,16 +64,21 @@ export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = as
     if (!cfg) continue;
 
     // Minimal supported kinds for first pass
-    const supportsText = cfg.kinds.includes('text-words');
+    const supportsTextWords = cfg.kinds.includes('text-words');
+    const supportsTextLines = cfg.kinds.includes('text-lines');
     const supportsFade = cfg.kinds.includes('fade-in');
 
     let timeline: gsap.core.Timeline | null = null;
     let splitRef: { revert: () => void } | null = null;
-    let createdTrigger: ScrollTrigger | null = null;
+    const createdTrigger: ScrollTrigger | null = null;
 
-    if (supportsText) {
+    if (supportsTextWords) {
       const res = await animateTextWords(cfg);
-      createdTrigger = res.trigger ?? null;
+      timeline = res.tl;
+      splitRef = res.split as unknown as { revert: () => void };
+    } else if (supportsTextLines) {
+      const res = await animateTextLines(cfg);
+      timeline = res.tl;
       splitRef = res.split as unknown as { revert: () => void };
     } else if (supportsFade) {
       timeline = animateFadeIn(cfg);
@@ -85,8 +91,8 @@ export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = as
       createScrollTrigger(
         element,
         () => {
+          if (cfg.preventFlicker) restoreVisibility(element);
           timeline?.play(0);
-          if (cfg.preventFlicker) element.style.visibility = '';
         },
         cfg.options
       );
@@ -95,7 +101,7 @@ export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = as
       trigger?.kill();
       timeline?.kill();
       splitRef?.revert?.();
-      if (cfg.preventFlicker) element.style.visibility = '';
+      if (cfg.preventFlicker) restoreVisibility(element);
     };
 
     cleanups.push(cleanup);

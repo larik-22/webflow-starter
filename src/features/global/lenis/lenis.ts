@@ -44,7 +44,6 @@ export function scrollToTopImmediate() {
   }
 }
 
-//TODO verify if works fine
 function connectScrollTrigger(lenis: Lenis) {
   onLenisScroll = () => ScrollTrigger.update();
   lenis.on('scroll', onLenisScroll);
@@ -53,9 +52,13 @@ function connectScrollTrigger(lenis: Lenis) {
     lenis.raf(time * 1000);
   };
   gsap.ticker.add(tickerCallback);
-  gsap.ticker.lagSmoothing(0);
 
-  ScrollTrigger.scrollerProxy(document.documentElement, {
+  const scroller = document.documentElement;
+  ScrollTrigger.defaults({ scroller });
+
+  const pinType = getComputedStyle(scroller).transform !== 'none' ? 'transform' : 'fixed';
+
+  ScrollTrigger.scrollerProxy(scroller, {
     scrollTop(value?: number) {
       if (!lenis) return window.scrollY || window.pageYOffset;
       if (typeof value === 'number') lenis.scrollTo(value, { immediate: true });
@@ -70,7 +73,15 @@ function connectScrollTrigger(lenis: Lenis) {
         height: window.innerHeight,
       };
     },
-    pinType: document.documentElement.style.transform ? 'transform' : 'fixed',
+    pinType,
+  });
+
+  ScrollTrigger.addEventListener('refresh', () => {
+    try {
+      (lenis as unknown as { update?: () => void }).update?.();
+    } catch {
+      // ignore
+    }
   });
 
   ScrollTrigger.refresh();

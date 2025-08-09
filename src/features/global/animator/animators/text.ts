@@ -3,46 +3,52 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
 import type { ElementAnimationConfig } from '../types';
-import { restoreVisibility, waitForFonts } from '../utils';
+import { DEFAULT_TEXT_ANIMATION } from '../types';
+import { waitForFonts } from '../utils';
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 export async function animateTextWords(cfg: ElementAnimationConfig) {
-  const { element, options, preventFlicker } = cfg;
-  console.log('animateTextWords', cfg);
+  const { element, options } = cfg;
   await waitForFonts();
-
-  let trigger: ScrollTrigger | null = null;
 
   const split = new SplitText(element, {
     type: 'words',
+    mask: 'words',
     linesClass: 'line-mask',
     wordsClass: 'word-mask',
     charsClass: 'char-mask',
-    onSplit: () => {
-      const words = split.words ?? [];
-      const tl = gsap.timeline({ paused: true });
-      tl.from(words, {
-        opacity: options.opacity ?? 0,
-        y: options.y ?? 20,
-        duration: options.duration ?? 0.8,
-        stagger: options.stagger ?? 0.04,
-        ease: options.ease ?? 'power2.out',
-        clearProps: 'all',
-      });
-
-      trigger = ScrollTrigger.create({
-        trigger: element,
-        start: options.start ?? 'top 85%',
-        end: options.end ?? 'bottom top',
-        once: options.once ?? true,
-        onEnter: () => {
-          if (preventFlicker) restoreVisibility(element);
-          tl.play(0);
-        },
-      });
-    },
   });
 
-  return { split, trigger } as const;
+  const words = split.words && split.words.length > 0 ? split.words : [element];
+
+  const tl = gsap.timeline({ paused: true });
+  tl.from(words, {
+    opacity: options.opacity ?? DEFAULT_TEXT_ANIMATION.opacity,
+    y: options.y ?? DEFAULT_TEXT_ANIMATION.y,
+    duration: options.duration ?? DEFAULT_TEXT_ANIMATION.duration,
+    stagger: options.stagger ?? DEFAULT_TEXT_ANIMATION.stagger,
+    ease: options.ease ?? DEFAULT_TEXT_ANIMATION.ease,
+  });
+
+  return { split, tl } as const;
+}
+
+export async function animateTextLines(cfg: ElementAnimationConfig) {
+  const { element, options } = cfg;
+  await waitForFonts();
+
+  const split = new SplitText(element, { type: 'lines', mask: 'lines', linesClass: 'line-mask' });
+  const lines = split.lines && split.lines.length > 0 ? split.lines : [element];
+
+  const tl = gsap.timeline({ paused: true });
+  tl.from(lines, {
+    opacity: options.opacity ?? DEFAULT_TEXT_ANIMATION.opacity,
+    y: options.y ?? DEFAULT_TEXT_ANIMATION.y,
+    duration: options.duration ?? DEFAULT_TEXT_ANIMATION.duration,
+    stagger: options.stagger ?? DEFAULT_TEXT_ANIMATION.stagger,
+    ease: options.ease ?? DEFAULT_TEXT_ANIMATION.ease,
+  });
+
+  return { split, tl } as const;
 }

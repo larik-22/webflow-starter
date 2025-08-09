@@ -155,9 +155,7 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
     const container = data.current?.container as HTMLElement;
     const namespace = (data.current?.namespace || data.next?.namespace) as string;
     const context = { container, namespace, isFirstLoad, to: { namespace: data.next?.namespace } };
-    return Promise.all(globalMods.map((m) => m.onLeave?.(context))).then(() => {
-      runCleanup();
-    });
+    return Promise.all(globalMods.map((m) => m.onLeave?.(context))).then(() => undefined);
   });
 
   barba.hooks.once((data: BarbaHookData) => {
@@ -172,13 +170,16 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
       isFirstLoad,
       from: { namespace: data.current?.namespace },
     };
-    return Promise.all(globalMods.map((m) => m.onOnce?.(context))).then(() => undefined);
+    return Promise.all(globalMods.map((m) => m.onOnce?.(context))).then(async (cleanups) => {
+      for (const c of cleanups) await handleCleanup(c as Cleanup);
+    });
   });
 
   barba.hooks.afterLeave((data: BarbaHookData) => {
     const container = data.current?.container as HTMLElement;
     const namespace = (data.current?.namespace || data.next?.namespace) as string;
     const context = { container, namespace, isFirstLoad, to: { namespace: data.next?.namespace } };
+    runCleanup();
     return Promise.all(globalMods.map((m) => m.onLeaveCompleted?.(context))).then(() => undefined);
   });
 

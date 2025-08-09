@@ -1,3 +1,5 @@
+import './styles/style.css';
+
 import { initBarba } from '$features/global/barba/barba';
 import { barbaConfig } from '$features/global/barba/config';
 import { lenisConfig } from '$features/global/lenis/config';

@@ -8,3 +8,8 @@
   padding-block: 0.1em;
   margin-block: -0.1em;
 }
+
+.u-rich-text .line-mask p {
+  margin-top: 0 !important;
+  margin-bottom: 0.75rem !important;
+}

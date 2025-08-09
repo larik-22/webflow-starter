@@ -25,7 +25,7 @@ export function readBoolean(el: HTMLElement, name: string, fallback = false): bo
 
 export function restoreVisibility(el: HTMLElement) {
   if (el.getAttribute('data-prevent-flicker') === 'true') {
-    gsap.set(el, { visibility: 'visible' });
+    gsap.set(el, { autoAlpha: 1, visibility: 'visible' });
   }
 }
 
