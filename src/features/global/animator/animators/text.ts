@@ -2,8 +2,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
+import { DEFAULT_TEXT_ANIMATION } from '../config';
 import type { ElementAnimationConfig } from '../types';
-import { DEFAULT_TEXT_ANIMATION } from '../types';
 import { waitForFonts } from '../utils';
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
