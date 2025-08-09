@@ -1,6 +1,7 @@
 import type { PageModule } from '$types/page';
 import { composeFeatures } from '$types/page';
 
+//TODO interface for page functions so they follow the same pattern
 // Example feature: mount handlers and return a cleanup
 function logFeature() {
   // setup

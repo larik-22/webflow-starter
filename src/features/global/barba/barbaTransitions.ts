@@ -1,5 +1,8 @@
-// Placeholder for custom transition definitions if needed in the future.
-// Currently transitions are defined directly in `barba.ts` inside the init call.
+/**
+ * @description
+ * Custom transition definitions for barba.
+ */
+
 import gsap from 'gsap';
 
 export function animationEnter(container: HTMLElement) {

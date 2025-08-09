@@ -1,14 +1,11 @@
 import barba from '@barba/core';
 import prefetch from '@barba/prefetch';
 
-import { refreshScrollTrigger } from '$features/global/lenis';
-import type { BarbaHookData, Cleanup, PageModule } from '$types/page';
+import { updateLenisScrollTrigger } from '$features/global/lenis/lenis';
+import type { BarbaHookData, Cleanup, InitOptions } from '$types/page';
+import { resetWebflow } from '$utils/destroyWebflow';
 
 import { animationEnter, animationLeave } from './barbaTransitions';
-
-type InitOptions = {
-  pages: PageModule[];
-};
 
 const cleanupStack: Array<() => void> = [];
 
@@ -122,6 +119,14 @@ export function initBarba({ pages }: InitOptions) {
     });
   });
 
+  /**
+   * @description
+   * Reset Webflow on enter to ensure new page is loaded correctly
+   */
+  barba.hooks.enter((data: BarbaHookData) => {
+    resetWebflow(data);
+  });
+
   barba.hooks.afterEnter((data: BarbaHookData) => {
     const container = data.next?.container as HTMLElement;
     const namespace = (data.next?.namespace || data.current?.namespace) as string;
@@ -152,7 +157,7 @@ export function initBarba({ pages }: InitOptions) {
 
   // After each navigation, refresh ScrollTrigger and mark first load as false
   barba.hooks.after(() => {
-    refreshScrollTrigger();
+    updateLenisScrollTrigger();
     isFirstLoad = false;
   });
 }

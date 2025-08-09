@@ -28,7 +28,7 @@ export function destroyLenis() {
   }
 }
 
-export function refreshScrollTrigger() {
+export function updateLenisScrollTrigger() {
   try {
     ScrollTrigger.refresh();
   } catch {
@@ -36,6 +36,7 @@ export function refreshScrollTrigger() {
   }
 }
 
+//TODO verify if works fine
 function connectScrollTrigger(lenis: Lenis) {
   onLenisScroll = () => ScrollTrigger.update();
   lenis.on('scroll', onLenisScroll);
