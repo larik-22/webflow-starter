@@ -46,12 +46,15 @@ function createScrollTrigger(element: HTMLElement, play: () => void, options: An
     start: options.start ?? 'top 85%',
     end: options.end ?? 'bottom top',
     once: options.once ?? true,
+    markers: true,
+    toggleActions: 'play none none reset',
     onEnter: play,
   });
   return trigger;
 }
 
-export const initAnimator: GlobalModule['onEnter'] = async ({ container }) => {
+export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = async (context) => {
+  const { container } = context;
   const animated = Array.from(container.querySelectorAll<HTMLElement>('[data-animate="true"]'));
   const cleanups: AnimatorCleanup[] = [];
 

@@ -36,6 +36,14 @@ export function updateLenisScrollTrigger() {
   }
 }
 
+export function scrollToTopImmediate() {
+  if (instance) {
+    instance.scrollTo(0, { immediate: true, lock: true });
+  } else {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }
+}
+
 //TODO verify if works fine
 function connectScrollTrigger(lenis: Lenis) {
   onLenisScroll = () => ScrollTrigger.update();

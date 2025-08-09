@@ -35,9 +35,6 @@ export interface PageModule {
    */
   namespace?: string | string[];
 
-  /** Called once on the first load of the page. */
-  onOnce?(context: BasePageContext): void | Promise<void>;
-
   /** Called before the page becomes visible. Return cleanup to auto-dispose on leave. */
   onEnter?(context: PageEnterContext): Cleanup | Promise<Cleanup>;
 
@@ -46,6 +43,16 @@ export interface PageModule {
    * Useful when you need access to `data.next.html` (e.g., Webflow reset).
    */
   onEnterData?(data: BarbaHookData): void | Promise<void>;
+
+  /**
+   * Called once on the very first page load. Return cleanup to auto-dispose on first leave.
+   */
+  onOnce?(context: PageEnterContext): Cleanup | Promise<Cleanup>;
+
+  /**
+   * Global-only: receive raw Barba hook data on the global `once` hook.
+   */
+  onOnceData?(data: BarbaHookData): void | Promise<void>;
 
   /** Called before leaving the page (animations can still be running). */
   onLeave?(context: PageLeaveContext): void | Promise<void>;

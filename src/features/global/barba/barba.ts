@@ -1,7 +1,12 @@
 import barba from '@barba/core';
 import prefetch from '@barba/prefetch';
 
-import { updateLenisScrollTrigger } from '$features/global/lenis/lenis';
+import {
+  destroyLenis,
+  initLenis,
+  scrollToTopImmediate,
+  updateLenisScrollTrigger,
+} from '$features/global/lenis/lenis';
 import type { BarbaHookData, Cleanup, InitOptions, PageModule } from '$types/page';
 
 import { animationEnter, animationLeave } from './barbaTransitions';
@@ -110,6 +115,9 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
 
   // Global custom code hooks (run on every page)
   barba.hooks.beforeEnter((data: BarbaHookData) => {
+    // Ensure Lenis is ready before running any global onEnter logic
+    initLenis();
+    scrollToTopImmediate();
     const container = data.next?.container as HTMLElement;
     const namespace = (data.next?.namespace || data.current?.namespace) as string;
     const context = {
@@ -153,6 +161,9 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
   });
 
   barba.hooks.once((data: BarbaHookData) => {
+    // Prepare scroller on first load
+    initLenis();
+    scrollToTopImmediate();
     const container = data.next?.container as HTMLElement;
     const namespace = (data.next?.namespace || data.current?.namespace) as string;
     const context = {
@@ -175,5 +186,10 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
   barba.hooks.after(() => {
     updateLenisScrollTrigger();
     isFirstLoad = false;
+  });
+
+  // Clean scroller state after leaving
+  barba.hooks.afterLeave(() => {
+    destroyLenis();
   });
 }
