@@ -1,7 +1,7 @@
-import type { PageModule } from '$types/page';
+import type { GlobalModule } from '$types/page';
 import { resetWebflow } from '$utils/destroyWebflow';
 
-export const webflowReset: PageModule = {
+export const webflowReset: GlobalModule = {
   onEnterData: (data) => {
     resetWebflow(data);
   },

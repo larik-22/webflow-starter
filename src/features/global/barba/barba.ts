@@ -92,13 +92,18 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
     // Transitions are ONLY for visual animations
     transitions: [
       {
-        name: 'fade',
-        leave(data: { current?: { container?: HTMLElement } }) {
-          animationLeave(data.current?.container as HTMLElement);
+        name: 'default-transition',
+        async leave(data: { current?: { container?: HTMLElement } }) {
+          await animationLeave(data.current?.container as HTMLElement);
         },
         enter(data: { next?: { container?: HTMLElement } }) {
           animationEnter(data.next?.container as HTMLElement);
         },
+
+        // CURSOR: don't remove
+        // once unfortunately works only if `transition` is enabled.
+        // needed to trigger hooks.once on first load
+        once() {},
       },
     ],
   });
@@ -145,6 +150,18 @@ export function initBarba({ pages = [], globals = [] }: InitOptions) {
     return Promise.all(globalMods.map((m) => m.onLeave?.(context))).then(() => {
       runCleanup();
     });
+  });
+
+  barba.hooks.once((data: BarbaHookData) => {
+    const container = data.next?.container as HTMLElement;
+    const namespace = (data.next?.namespace || data.current?.namespace) as string;
+    const context = {
+      container,
+      namespace,
+      isFirstLoad,
+      from: { namespace: data.current?.namespace },
+    };
+    return Promise.all(globalMods.map((m) => m.onOnce?.(context))).then(() => undefined);
   });
 
   barba.hooks.afterLeave((data: BarbaHookData) => {

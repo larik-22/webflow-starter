@@ -1,3 +1,4 @@
+import { animatorModule } from '$features/global/animator/module';
 import { webflowReset } from '$features/global/modules/webflowReset';
 import { homepage } from '$pages/homepage';
 
@@ -7,6 +8,6 @@ import { homepage } from '$pages/homepage';
  * Initialize page-specific modules & global core modules here
  */
 export const barbaConfig = {
-  globals: [webflowReset],
+  globals: [webflowReset, animatorModule],
   pages: [homepage],
 };

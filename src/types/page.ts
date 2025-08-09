@@ -35,6 +35,9 @@ export interface PageModule {
    */
   namespace?: string | string[];
 
+  /** Called once on the first load of the page. */
+  onOnce?(context: BasePageContext): void | Promise<void>;
+
   /** Called before the page becomes visible. Return cleanup to auto-dispose on leave. */
   onEnter?(context: PageEnterContext): Cleanup | Promise<Cleanup>;
 
