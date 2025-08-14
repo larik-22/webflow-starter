@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { GlobalModule } from '$types/page';
 
 import { animateFadeIn } from './animators/basic';
+import { animateScaleIn, animateScaleOut } from './animators/scale';
 import { animateTextLines, animateTextWords } from './animators/text';
 import type {
   AnimationKind,
@@ -29,6 +30,7 @@ function buildConfig(element: HTMLElement): ElementAnimationConfig | null {
     opacity: readNumber(element, 'data-opacity'),
     y: readNumber(element, 'data-y'),
     x: readNumber(element, 'data-x'),
+    scale: readNumber(element, 'data-scale'),
     once: readBoolean(element, 'data-once', true),
     ease: element.getAttribute('data-ease') ?? undefined,
     start: element.getAttribute('data-start') ?? undefined,
@@ -47,8 +49,8 @@ function createScrollTrigger(element: HTMLElement, play: () => void, options: An
     start: options.start ?? 'top 85%',
     end: options.end ?? 'bottom top',
     once: options.once ?? true,
-    markers: true,
-    toggleActions: 'play none none nones',
+    //markers: true,
+    toggleActions: 'play none none none',
     onEnter: play,
   });
   return trigger;
@@ -67,6 +69,8 @@ export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = as
     const supportsTextWords = cfg.kinds.includes('text-words');
     const supportsTextLines = cfg.kinds.includes('text-lines');
     const supportsFade = cfg.kinds.includes('fade-in');
+    const supportsScaleIn = cfg.kinds.includes('scale-in');
+    const supportsScaleOut = cfg.kinds.includes('scale-out');
 
     let timeline: gsap.core.Timeline | null = null;
     let splitRef: { revert: () => void } | null = null;
@@ -80,6 +84,10 @@ export const initAnimator: GlobalModule['onEnter'] | GlobalModule['onOnce'] = as
       const res = await animateTextLines(cfg);
       timeline = res.tl;
       splitRef = res.split as unknown as { revert: () => void };
+    } else if (supportsScaleIn) {
+      timeline = animateScaleIn(cfg);
+    } else if (supportsScaleOut) {
+      timeline = animateScaleOut(cfg);
     } else if (supportsFade) {
       timeline = animateFadeIn(cfg);
     }

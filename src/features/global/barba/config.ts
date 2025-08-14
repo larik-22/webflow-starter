@@ -1,5 +1,5 @@
-import { animatorModule } from '$features/global/animator/module';
-import { webflowReset } from '$features/global/modules/webflowReset';
+import { animatorModule } from '$features/global/barba/modules/animatorModule';
+import { webflowReset } from '$features/global/barba/modules/webflowReset';
 import { homepage } from '$pages/homepage';
 
 /**

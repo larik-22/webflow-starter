@@ -15,3 +15,19 @@ export const DEFAULT_SCROLL_OPTIONS: Required<Pick<AnimationOptions, 'start' | '
   end: 'bottom top',
   once: true,
 };
+
+export const DEFAULT_SCALE_ANIMATION = {
+  in: {
+    endScale: 1.2,
+    startScale: 1,
+    opacity: 0,
+    duration: 0.8,
+    ease: 'power2.out',
+  },
+  out: {
+    scale: 0.9,
+    opacity: 0,
+    duration: 0.8,
+    ease: 'power2.out',
+  },
+} as const;

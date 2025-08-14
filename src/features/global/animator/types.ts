@@ -1,4 +1,11 @@
-export type AnimationKind = 'text-words' | 'text-lines' | 'text-chars' | 'fade-in' | 'slide-in';
+export type AnimationKind =
+  | 'text-words'
+  | 'text-lines'
+  | 'text-chars'
+  | 'fade-in'
+  | 'slide-in'
+  | 'scale-in'
+  | 'scale-out';
 
 export type AnimationOptions = {
   duration?: number;
@@ -7,6 +14,7 @@ export type AnimationOptions = {
   opacity?: number;
   y?: number;
   x?: number;
+  scale?: number;
   ease?: string;
   start?: string;
   end?: string;
