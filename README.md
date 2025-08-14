@@ -14,6 +14,7 @@ Before starting to work with this template, please take some time to read throug
     - [Serving files on development mode](#serving-files-on-development-mode)
     - [Building multiple files](#building-multiple-files)
     - [Setting up a path alias](#setting-up-a-path-alias)
+  - [Modular structure](#modular-structure)
 - [Contributing guide](#contributing-guide)
 - [Pre-defined scripts](#pre-defined-scripts)
 - [CI/CD](#cicd)
@@ -148,6 +149,75 @@ You can set up path aliases using the `paths` setting in `tsconfig.json`. This t
 ```
 
 To avoid any surprises, take some time to familiarize yourself with the [tsconfig](/tsconfig.json) enabled flags.
+
+### Modular structure
+
+Keep your code modular with small, composable pieces:
+
+- **Features**: small units of behavior that can be composed together
+- **Pages**: namespaced modules that run on matching pages
+- **Global modules**: run on every page via Barba hooks
+
+Example setup:
+
+```ts
+// src/features/homepage/logFeature.ts
+import type { Feature } from '$types/page';
+
+export const logFeature: Feature = ({ namespace }) => {
+  // eslint-disable-next-line no-console
+  console.log(`[${namespace}] feature mounted`);
+  return () => {
+    // eslint-disable-next-line no-console
+    console.log(`[${namespace}] feature cleaned`);
+  };
+};
+```
+
+```ts
+// src/pages/homepage.ts
+import { composeFeatures, type PageModule } from '$types/page';
+import { logFeature } from '$features/homepage/logFeature';
+
+const initHomepage = composeFeatures([logFeature]);
+
+export const homepage: PageModule = {
+  namespace: 'home',
+  async onEnter(ctx) {
+    return await initHomepage(ctx);
+  },
+};
+```
+
+```ts
+// src/features/global/barba/config.ts
+import { homepage } from '$pages/homepage';
+import { animatorModule } from '$features/global/barba/modules/animatorModule';
+import { webflowReset } from '$features/global/barba/modules/webflowReset';
+
+export const barbaConfig = {
+  globals: [webflowReset, animatorModule],
+  pages: [homepage],
+};
+```
+
+```ts
+// src/index.ts
+import { initBarba } from '$features/global/barba/barba';
+import { barbaConfig } from '$features/global/barba/config';
+import { initLenis } from '$features/global/lenis/lenis';
+
+window.Webflow ||= [];
+window.Webflow.push(() => {
+  initLenis();
+  initBarba(barbaConfig);
+});
+```
+
+Notes:
+
+- **Namespaces** map to your page's `data-barba-namespace` (e.g., `home`).
+- **Features** return a cleanup function (optional) that runs on leave.
 
 ## Testing
 
