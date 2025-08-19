@@ -7,7 +7,8 @@
       "$utils/*": ["src/utils/*"],
       "$pages/*": ["src/pages/*"],
       "$types/*": ["src/types/*"],
-      "$features/*": ["src/features/*"]
+      "$features/*": ["src/features/*"],
+      "$services/*": ["src/services/*"]
     },
     "types": ["@finsweet/ts-utils"]
   }
