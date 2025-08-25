@@ -5,7 +5,7 @@ import type { Feature } from '$types/page';
  * @returns A function to clean up the feature.
  */
 export const logFeature: Feature = () => {
-  // eslint-disable-next-line no-console
+  //function code
   console.log('[homepage] feature mounted');
   return () => {
     // eslint-disable-next-line no-console

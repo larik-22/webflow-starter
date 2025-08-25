@@ -1,0 +1,5 @@
+/* Base styles for accordion content to support GSAP height animation */
+[data-accordion-content] {
+  height: 0;
+  overflow: hidden;
+}

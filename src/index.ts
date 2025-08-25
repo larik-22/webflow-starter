@@ -1,4 +1,4 @@
-import './styles/style.css';
+import './styles/index.css';
 
 import { initBarba } from '$features/global/barba/barba';
 import { barbaConfig } from '$features/global/barba/config';
